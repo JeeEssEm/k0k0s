@@ -15,25 +15,28 @@ def verify_password(pwd, hashed_pwd):
     return pwd_context.verify(pwd, hashed_pwd)
 
 
-def generate_token(user_id, exp, token_type):
+def generate_token(user_id, exp, token_type, hashed_password):
     return jwt.encode({
         'id': user_id,
         'type': token_type,
-        'exp': exp
+        'exp': exp,
+        'hashed_password': hashed_password
     }, algorithm=ALGORITHM, key=settings.SECRET_KEY)
 
 
-def create_tokens(user_id):
+def create_tokens(user_id, hashed_password):
     access_token = generate_token(
         user_id,
         dt.datetime.utcnow() + dt.timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRES),
         'access',
+        hashed_password
     )
     refresh_token = generate_token(
         user_id,
         dt.datetime.utcnow() + dt.timedelta(days=settings.REFRESH_TOKEN_EXPIRES),
         'refresh',
+        hashed_password
     )
 
     return {
@@ -52,9 +55,8 @@ def decode_token(token):
 def is_valid_token(token, user):
     try:
         token = decode_token(token)
-        # if verify_password(token.get('pwd'), user.pwd):
-            # return False
-        # TODO: verify pwd hash
+        if token.get('hashed_password') != user.password:
+            return False
         return True
     except Exception:
         return False

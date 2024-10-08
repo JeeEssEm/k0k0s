@@ -1,11 +1,5 @@
-from models import Order
-from core.utils import get_current_user
-# from schemas import 
-# from services import 
+from fastapi import APIRouter
 
-from typing import Annotated
-from fastapi import APIRouter, Path, Depends
-from fastapi import status
 
 router = APIRouter(tags=['orders'], prefix='/orders')
 

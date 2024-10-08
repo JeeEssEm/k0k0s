@@ -17,7 +17,7 @@ async def get_current_user(
     try:
         data = decode_token(token)
         user = await user_service.get_by_id(data.get('id'))
-        if is_valid_token(token):
+        if is_valid_token(token, user):
             return user
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

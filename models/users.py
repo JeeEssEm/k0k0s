@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import date
 
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -18,4 +18,4 @@ class User(Base):
     avatar: Mapped[str | None]
     birthday = Mapped[date | None]
 
-    orders: Mapped[list['Order']] = relationship(back_populates='user')
+    orders: Mapped[list['Order']] = relationship(back_populates='user')  # noqa
