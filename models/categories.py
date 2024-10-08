@@ -9,4 +9,4 @@ class Category(Base):
     title: Mapped[int]
     is_hidden: Mapped[bool]
 
-    items: Mapped[list['Item']] = relationship(back_populates='category')
+    items: Mapped[list['Item']] = relationship(back_populates='category', cascade='all, delete-orphan')
