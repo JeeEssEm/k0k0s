@@ -1,8 +1,6 @@
-from abc import ABC, abstractmethod
 from fastapi import Depends
 
 from database import AsyncSession, get_session
-from repositories.base import Repository
 
 
 class Service:

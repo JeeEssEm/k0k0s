@@ -1,9 +1,16 @@
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey
 
-from datetime import date
+from enum import Enum
 
 from database import Base
+
+
+class Status(Enum):
+    completed = 'completed'
+    in_progress = 'in_progress'
+    cancelled = 'cancelled'
+    pending = 'pending'
 
 
 class Order(Base):
@@ -11,8 +18,8 @@ class Order(Base):
 
     item_id: Mapped[int] = mapped_column(ForeignKey('items.id'))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    comment: Mapped[str] = mapped_column(default=None)
+    status: Mapped[Status] = mapped_column(default=Status.pending)
 
-    date: Mapped[date]
-
-    user: Mapped['User'] = relationship(back_populates='orders')
-    item: Mapped['Item'] = relationship()
+    user: Mapped['User'] = relationship(back_populates='orders')  # noqa
+    item: Mapped['Item'] = relationship()  # noqa

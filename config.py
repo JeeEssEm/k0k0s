@@ -1,4 +1,3 @@
-import os
 import uuid
 from pydantic_settings import BaseSettings
 
@@ -14,7 +13,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     VERIFIED: bool = True
-    SECRET_KEY: str = '123'  # str(uuid.uuid4())
+    SECRET_KEY: str = str(uuid.uuid4())
     REFRESH_TOKEN_EXPIRES: int = 30
     ACCESS_TOKEN_EXPIRES: int = 30
 

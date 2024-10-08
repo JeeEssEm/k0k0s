@@ -2,7 +2,7 @@ from typing import Annotated
 from datetime import datetime
 
 from sqlalchemy import func
-from sqlalchemy.orm import Mapped, sessionmaker, declared_attr, declarative_base, mapped_column
+from sqlalchemy.orm import Mapped, sessionmaker, declarative_base, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs, create_async_engine
 
 from config import get_database_url
@@ -28,7 +28,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 
 def load_models():
-    from models import Item, User, Order, Category
+    from models import Item, User, Order, Category  # noqa
 
 
 engine = create_async_engine(get_database_url())

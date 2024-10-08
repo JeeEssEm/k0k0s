@@ -6,7 +6,8 @@ from database import Base
 class Category(Base):
     __tablename__ = 'categories'
 
-    title: Mapped[int]
+    title: Mapped[str]
     is_hidden: Mapped[bool]
+    deleted: Mapped[bool] = mapped_column(default=False)
 
-    items: Mapped[list['Item']] = relationship(back_populates='category', cascade='all, delete-orphan')
+    items: Mapped[list['Item']] = relationship(back_populates='category')  # noqa

@@ -7,7 +7,3 @@ class CreateItem(BaseModel):
     price: int | None = Field(default=0)
     amount: int | None = Field(default=0)
     is_hidden: bool | None = Field(default=False)
-
-
-class ItemSchema(CreateItem):
-    id: int

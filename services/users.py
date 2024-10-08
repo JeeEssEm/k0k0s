@@ -4,7 +4,7 @@ from repositories import UsersRepository
 from schemas import CreateUser
 
 from fastapi.exceptions import HTTPException
-from starlette import status
+from fastapi import status
 
 
 class UserService(Service):
@@ -19,7 +19,7 @@ class UserService(Service):
         if not verify_password(password, user.password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail='Incorrect password')
-        return create_tokens(user.id)
+        return create_tokens(user.id, user.password)
 
     async def create_user(self, user: CreateUser):
         if await self.repository.check_exists(user.fullname, user.email):
