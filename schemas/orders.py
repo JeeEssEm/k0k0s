@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from .users import ShortUser
-from . import ItemSchema
+from . import Item
 
 
 class CreateOrder(BaseModel):
@@ -8,7 +8,7 @@ class CreateOrder(BaseModel):
     comment: str | None
 
 
-class OrderSchema(CreateOrder):
+class Order(CreateOrder):
     id: int
-    item: ItemSchema | None
+    item: Item | None
     user: ShortUser | None

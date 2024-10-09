@@ -1,40 +1,43 @@
-from passlib.context import CryptContext
+from argon2 import PasswordHasher
+from hashlib import md5
 from config import settings
-import datetime as dt
+from datetime import datetime, timedelta, timezone
 import jwt
 
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 ALGORITHM = 'HS256'
+ph = PasswordHasher()
 
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def get_password_hash(password) -> str:
+    return ph.hash(password)
 
 
-def verify_password(pwd, hashed_pwd):
-    return pwd_context.verify(pwd, hashed_pwd)
+def verify_password(pwd, hashed_pwd) -> bool:
+    return ph.verify(hashed_pwd, pwd)
 
 
-def generate_token(user_id, exp, token_type, hashed_password):
+def generate_token(user_id: int, exp: datetime,
+                   token_type: str, hashed_password: str) -> str:
     return jwt.encode({
         'id': user_id,
         'type': token_type,
         'exp': exp,
-        'hashed_password': hashed_password
+        'sign': md5(hashed_password.encode()).hexdigest()
     }, algorithm=ALGORITHM, key=settings.SECRET_KEY)
 
 
-def create_tokens(user_id, hashed_password):
+def create_tokens(user_id: int, hashed_password: str) -> dict:
     access_token = generate_token(
         user_id,
-        dt.datetime.utcnow() + dt.timedelta(
+        datetime.now(timezone.utc) + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRES),
         'access',
         hashed_password
     )
     refresh_token = generate_token(
         user_id,
-        dt.datetime.utcnow() + dt.timedelta(days=settings.REFRESH_TOKEN_EXPIRES),
+        datetime.now(timezone.utc) + timedelta(
+            days=settings.REFRESH_TOKEN_EXPIRES),
         'refresh',
         hashed_password
     )
@@ -45,18 +48,16 @@ def create_tokens(user_id, hashed_password):
     }
 
 
-def decode_token(token):
+def decode_token(token: str) -> dict:
     return jwt.decode(
         token, algorithms=[ALGORITHM],
         key=settings.SECRET_KEY
     )
 
 
-def is_valid_token(token, user):
+def is_valid_token(token: str, password: str) -> bool:
     try:
         token = decode_token(token)
-        if token.get('hashed_password') != user.password:
-            return False
-        return True
+        return token.get('sign') == md5(password.encode()).hexdigest()
     except Exception:
         return False

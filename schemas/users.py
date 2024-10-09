@@ -8,12 +8,12 @@ password_exp = re.compile(
 )
 
 
-class UserMixin(BaseModel):
+class BaseUser(BaseModel):
     fullname: str
     email: EmailStr
 
 
-class CreateUser(UserMixin):
+class CreateUser(BaseUser):
     password1: str
     password2: str
     phone: str | None = None
@@ -38,6 +38,6 @@ class CreateUser(UserMixin):
     #  TODO: phone number validator
 
 
-class ShortUser(UserMixin):
+class ShortUser(BaseUser):
     id: int
     joined: date

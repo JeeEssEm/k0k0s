@@ -28,3 +28,10 @@ async def edit_category():
 @router.delete('/{category_id}')
 async def delete_category():
     pass
+
+
+@router.get('/')
+async def get_categories(
+        category_service: Annotated[CategoriesService, Depends()]
+):
+    return await category_service.get_categories()

@@ -1,6 +1,10 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey
 
+if TYPE_CHECKING:
+    from .categories import Category
 from database import Base
 
 
@@ -15,4 +19,4 @@ class Item(Base):
     deleted: Mapped[bool] = mapped_column(default=False)
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
 
-    category: Mapped['Category'] = relationship(back_populates='items')  # noqa
+    category: Mapped['Category'] = relationship(back_populates='items')

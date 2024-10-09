@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Response, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from starlette import status
+from fastapi import status
 
 router = APIRouter(tags=['auth'], prefix='/auth')
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
@@ -16,7 +16,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
 async def login(
     response: Response,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    user_service: UserService = Depends()
+    user_service: Annotated[UserService, Depends()]
 ):
     username = form_data.username
     password = form_data.password
@@ -37,8 +37,7 @@ async def register(
     return await user_service.create_user(form)
 
 
-@router.post('/update-token', status_code=status.HTTP_200_OK,
-             response_model=Token)
+@router.post('/update-token', status_code=status.HTTP_200_OK)
 async def update_token(
         request: Request,
         user_service: UserService = Depends()

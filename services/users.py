@@ -1,51 +1,43 @@
 from .base import Service
 from core.security import verify_password, create_tokens, decode_token
 from repositories import UsersRepository
-from schemas import CreateUser
-
-from fastapi.exceptions import HTTPException
-from fastapi import status
+from schemas import CreateUser, ShortUser
+from exceptions import (UserNotFound, InvalidToken, IncorrectPassword,
+                        UserAlreadyExists)
 
 
 class UserService(Service):
     repository: UsersRepository
 
-    async def login_user(self, username, password):
+    async def login_user(self, username: str, password: str) -> dict:
         user = await self.repository.get_by_username(username)
+        hashed_pwd = await self.repository.get_user_hashed_password(user.id)
         if user is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail='User not found')
+            raise UserNotFound
 
-        if not verify_password(password, user.password):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                detail='Incorrect password')
-        return create_tokens(user.id, user.password)
+        if not verify_password(password, hashed_pwd):
+            raise IncorrectPassword
+        return create_tokens(user.id, hashed_pwd)
 
-    async def create_user(self, user: CreateUser):
+    async def create_user(self, user: CreateUser) -> ShortUser:
         if await self.repository.check_exists(user.fullname, user.email):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail='Email or name already registered'
-            )
+            raise UserAlreadyExists
         return await self.repository.create_user(user)
 
-    async def get_by_id(self, user_id):
+    async def get_by_id(self, user_id) -> ShortUser:
         return await self.repository.get_by_id(user_id)
 
-    async def update_token(self, token):
+    async def get_user_password(self, user_id: int) -> str:
+        return await self.repository.get_user_hashed_password(user_id)
+
+    async def update_token(self, token) -> str:
         try:
             data = decode_token(token)
             if data.get('type') != 'refresh':
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail='Invalid token'
-                )
+                raise InvalidToken
             current_user = await self.repository.get_by_id(data.get('id'))
-            tokens = create_tokens(current_user.id)
+            tokens = create_tokens(current_user.id, current_user.password)
             return tokens['access_token']
 
         except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='Invalid token'
-            )
+            raise InvalidToken

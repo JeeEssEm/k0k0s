@@ -1,30 +1,25 @@
+from typing import Annotated
+
+from fastapi import Depends
+
 from .security import is_valid_token, decode_token
 from services.users import UserService
 from routers.auth import oauth2_scheme
-
-from fastapi import Depends
-from fastapi.exceptions import HTTPException
-from typing import Annotated
-from fastapi import status
+from exceptions import InvalidToken, TokenExpired
 
 
 async def get_current_user(
         token: Annotated[str, Depends(oauth2_scheme)],
-        user_service: UserService = Depends()
+        user_service: Annotated[UserService, Depends()]
 ):
     if not token:
         return None
     try:
-        data = decode_token(token)
-        user = await user_service.get_by_id(data.get('id'))
-        if is_valid_token(token, user):
+        user_id = decode_token(token).get('id')
+        user = await user_service.get_by_id(user_id)
+        password = await user_service.get_user_password(user_id)
+        if is_valid_token(token, password):
             return user
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Token is not valid anymore'
-        )
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f'Token expired! {exc}'
-        )
+        raise InvalidToken
+    except Exception:
+        raise TokenExpired

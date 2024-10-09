@@ -1,8 +1,12 @@
+from enum import Enum
+from typing import TYPE_CHECKING
+
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey
 
-from enum import Enum
-
+if TYPE_CHECKING:
+    from .items import Item
+    from .users import User
 from database import Base
 
 
@@ -21,5 +25,5 @@ class Order(Base):
     comment: Mapped[str] = mapped_column(default=None)
     status: Mapped[Status] = mapped_column(default=Status.pending)
 
-    user: Mapped['User'] = relationship(back_populates='orders')  # noqa
-    item: Mapped['Item'] = relationship()  # noqa
+    user: Mapped['User'] = relationship(back_populates='orders')
+    item: Mapped['Item'] = relationship()
