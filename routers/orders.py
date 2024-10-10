@@ -41,18 +41,6 @@ async def get_order(
     return await order_service.get_order_by_id(order_id, current_user)
 
 
-# @router.patch('/{order_id}')
-# async def edit_order(
-#     order_id: int,
-#     data: EditOrder,
-#     order_service: Annotated[OrdersService, Depends()],
-#     current_user: Annotated[User, Depends(get_current_authenticated_user)],
-# ):
-#     if not current_user.is_admin:
-#         raise NotEnoughRights  # заказы могут редактировать только админы
-#     return await order_service.edit_order(order_id, data)
-
-
 @router.delete('/{order_id}')
 async def cancel_order(
     order_id: int,
