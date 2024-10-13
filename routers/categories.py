@@ -2,7 +2,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from core.utils import get_current_authenticated_user, get_current_user
 from services import CategoriesService
+from schemas import ShortUser
 
 router = APIRouter(tags=['categories'], prefix='/categories')
 
@@ -15,9 +17,10 @@ async def create_category():
 @router.get('/{category_id}')
 async def get_category_by_id(
         category_id: int,
+        current_user: Annotated[ShortUser, Depends(get_current_user)],
         category_service: Annotated[CategoriesService, Depends()]
 ):
-    return await category_service.get_category_by_id(category_id)
+    return await category_service.get_category_by_id(category_id, current_user)
 
 
 @router.patch('/{category_id}')

@@ -21,7 +21,8 @@ class UsersRepository(Repository):
             id=user.id,
             fullname=user.fullname,
             email=user.email,
-            joined=user.created_at.date()
+            joined=user.created_at.date(),
+            is_admin=user.is_admin,
         )
 
     async def get_by_id(self, user_id: int) -> ShortUser:

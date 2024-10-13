@@ -16,6 +16,7 @@ class User(Base):
     email: Mapped[str]
     fullname: Mapped[str]
     password: Mapped[str]
+    is_admin: Mapped[bool] = mapped_column(default=False)
 
     verified: Mapped[bool] = mapped_column(default=False)
     avatar: Mapped[str | None]
