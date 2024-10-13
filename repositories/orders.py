@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 import models
 from .base import Repository
-from schemas import Order, CreateOrder, ShortUser, Item, Category
+from schemas import Order, CreateOrder, MiniUser, MiniItem, EditOrder, MiniOrder
 from exceptions import OrderNotFound
 
 
@@ -10,25 +10,19 @@ class OrdersRepository(Repository):
     def _convert_model_to_schema(self, order: models.Order) -> Order:
         return Order(
             id=order.id,
-            item_id=order.item_id,
             comment=order.comment,
-            item=Item(
+            status=order.status,
+            is_paid=order.is_paid,
+            item_id=order.item_id,
+            item=MiniItem(
                 id=order.item.id,
                 title=order.item.title,
-                description=order.item.description,
-                is_hidden=order.item.is_hidden,
-                amount=order.item.amount,
-                price=order.item.price,
-                category=Category(
-                    id=order.item.category.id,
-                    title=order.item.category.title,
-                    is_hidden=order.item.category.is_hidden
-                )
+                price=order.item.price
             ),
-            user=ShortUser(
+            user=MiniUser(
                 id=order.user.id,
                 fullname=order.user.fullname,
-                email=order.user.email,
+                email=order.user.email
             )
         )
 
@@ -45,16 +39,16 @@ class OrdersRepository(Repository):
 
     async def create_order(self, data: CreateOrder, user_id: int) -> Order:
         order = models.Order(
-            item_id=data.item.id,
+            item_id=data.item_id,
             user_id=user_id,
             comment=data.comment
         )
-        await self.session.add(order)
+        self.session.add(order)
         await self.session.commit()
         await self.session.refresh(order)
         return self._convert_model_to_schema(order)
 
-    async def edit_order(self, order_id: int, data: CreateOrder) -> Order:
+    async def edit_order(self, order_id: int, data: EditOrder) -> Order:
         order = await self._get_order_by_id(order_id)
         order.status = data.status
         await self.session.commit()
@@ -64,7 +58,34 @@ class OrdersRepository(Repository):
     async def get_orders(self, status: models.Status | None = None) -> list[Order]:
         q = select(models.Order)
         if status:
-            q = q.where(models.Order.status == status)
+            q = q.where(models.Order.status == status)  # noqa
         orders = await self.session.execute(q)
         return list(map(self._convert_model_to_schema, orders.scalars().all()))
         # TODO: pagination
+
+    async def cancel_order(self, order_id: int):
+        order = await self._get_order_by_id(order_id)
+        order.status = models.Status.cancelled
+        await self.session.commit()
+        await self.session.refresh(order)
+
+    async def get_user_orders(self, user_id: int) -> list[MiniOrder]:
+        q = select(models.Order).where(models.Order.user_id == user_id)  # noqa
+        orders = await self.session.scalars(q)
+
+        return [MiniOrder(
+            id=order.id,
+            item_id=order.item_id,
+            item=order.item.title,
+            comment=order.comment,
+            amount=order.amount,
+            is_paid=order.is_paid,
+            status=order.status
+        )
+                for order in orders.all()]
+
+    async def purchase_order(self, order_id: int):
+        order = await self._get_order_by_id(order_id)
+        order.is_paid = True
+        await self.session.commit()
+        await self.session.refresh(order)

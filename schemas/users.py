@@ -21,7 +21,12 @@ class CreateUser(BaseUser):
         return v
 
 
-class ShortUser(BaseUser):
+class MiniUser(BaseUser):
     id: int
+
+
+class User(MiniUser):
     joined: date
     is_admin: bool | None
+
+    is_anonymous: bool = False

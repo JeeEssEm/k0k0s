@@ -1,7 +1,7 @@
 from .base import Service
 from core.security import verify_password, create_tokens, decode_token
 from repositories import UsersRepository
-from schemas import CreateUser, ShortUser
+from schemas import CreateUser, User
 from exceptions import (UserNotFound, InvalidToken, IncorrectPassword,
                         UserAlreadyExists)
 
@@ -19,12 +19,12 @@ class UserService(Service):
             raise IncorrectPassword
         return create_tokens(user.id, hashed_pwd)
 
-    async def create_user(self, user: CreateUser) -> ShortUser:
+    async def create_user(self, user: CreateUser) -> User:
         if await self.repository.check_exists(user.fullname, user.email):
             raise UserAlreadyExists
         return await self.repository.create_user(user)
 
-    async def get_by_id(self, user_id) -> ShortUser:
+    async def get_by_id(self, user_id) -> User:
         return await self.repository.get_by_id(user_id)
 
     async def get_user_password(self, user_id: int) -> str:

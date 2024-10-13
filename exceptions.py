@@ -15,5 +15,5 @@ IncorrectPassword = HTTPException(status.HTTP_401_UNAUTHORIZED,
 UserAlreadyExists = HTTPException(status.HTTP_400_BAD_REQUEST,
                                   'User with such name or email already exists')
 
-NotEnoughRights = HTTPException(status.HTTP_403_FORBIDDEN,
-                                'Not enough rights')
+NotEnoughRights = HTTPException(status.HTTP_403_FORBIDDEN, 'Not enough rights')
+NotAuthorized = HTTPException(status.HTTP_401_UNAUTHORIZED, 'not authorized')

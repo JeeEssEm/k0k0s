@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from .items import MiniItem
 
 
-
 class CreateCategory(BaseModel):
     title: str
     is_hidden: bool

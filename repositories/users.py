@@ -6,7 +6,7 @@ from exceptions import UserNotFound
 from .base import Repository
 import models
 
-from schemas import CreateUser, ShortUser
+from schemas import CreateUser, User
 
 
 class UsersRepository(Repository):
@@ -16,8 +16,8 @@ class UsersRepository(Repository):
             raise UserNotFound
         return user
 
-    def _convert_model_to_schema(self, user: models.User) -> ShortUser:
-        return ShortUser(
+    def _convert_model_to_schema(self, user: models.User) -> User:
+        return User(
             id=user.id,
             fullname=user.fullname,
             email=user.email,
@@ -25,20 +25,22 @@ class UsersRepository(Repository):
             is_admin=user.is_admin,
         )
 
-    async def get_by_id(self, user_id: int) -> ShortUser:
+    async def get_by_id(self, user_id: int) -> User:
         user = await self._get_user_by_id(user_id)
         return self._convert_model_to_schema(user)
 
     async def get_user_hashed_password(self, user_id: int) -> str:
         return (await self._get_user_by_id(user_id)).password
 
-    async def get_by_username(self, data: str) -> ShortUser:
+    async def get_by_username(self, data: str) -> User:
         q = select(models.User).where(
             or_(models.User.email == data, models.User.fullname == data)
         )
-        res = await self.session.execute(q)
+        user = (await self.session.scalars(q)).first()
+        if not user:
+            raise UserNotFound
         return self._convert_model_to_schema(
-            res.scalars().first()
+            user
         )
 
     async def check_exists(self, fullname: str, email: str) -> bool:
@@ -48,7 +50,7 @@ class UsersRepository(Repository):
         res = await self.session.execute(q)
         return res.scalars().first() is not None
 
-    async def create_user(self, user: CreateUser) -> ShortUser:
+    async def create_user(self, user: CreateUser) -> User:
         new_user = models.User(
             email=user.email,
             fullname=user.fullname,

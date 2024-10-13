@@ -1,4 +1,4 @@
-from schemas import Item, CreateItem, ShortUser, Category
+from schemas import Item, CreateItem, User, Category, CategoryItems
 from .base import Service
 from repositories import ItemsRepository
 from exceptions import ItemNotFound
@@ -10,7 +10,7 @@ class ItemsService(Service):
     async def create_item(self, data: CreateItem) -> Item:
         return await self.repository.create_item(data)
 
-    async def get_item_by_id(self, item_id: int, current_user: ShortUser) -> Item:
+    async def get_item_by_id(self, item_id: int, current_user: User) -> Item:
         item = await self.repository.get_item_by_id(item_id)
         if (item.is_hidden and not current_user.is_admin) or item.is_deleted:
             raise ItemNotFound
@@ -28,7 +28,7 @@ class ItemsService(Service):
             raise ItemNotFound
         await self.repository.delete_item(item_id)
 
-    async def get_items_by_category(self, category: Category, current_user: ShortUser) -> list[Item]:
+    async def get_items_by_category(self, category: Category, current_user: User) -> CategoryItems:
         return await self.repository.get_items_by_category(
             category, current_user.is_admin
         )

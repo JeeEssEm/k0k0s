@@ -49,7 +49,7 @@ class ItemsRepository(Repository):
         return item
 
     async def get_item_by_id(self, item_id: int) -> Item:
-        return await self._convert_model_to_schema(
+        return self._convert_model_to_schema(
             await self._get_item_by_id(item_id)
         )
 

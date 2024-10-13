@@ -16,7 +16,7 @@ class CreateItem(BaseModel):
 
 class Item(CreateItem):
     id: int
-    category: Optional['Category']
+    category: Optional['Category'] = None
     is_deleted: bool
 
 

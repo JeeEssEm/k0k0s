@@ -6,8 +6,8 @@ from fastapi import Depends
 from .security import is_valid_token, decode_token
 from services.users import UserService
 from routers.auth import oauth2_scheme
-from exceptions import InvalidToken, TokenExpired
-from schemas import ShortUser
+from exceptions import InvalidToken, TokenExpired, NotAuthorized
+from schemas import User
 
 
 async def get_current_user(
@@ -15,12 +15,13 @@ async def get_current_user(
         user_service: Annotated[UserService, Depends()]
 ):
     if not token:
-        return ShortUser(
+        return User(
             id=-1,
             fullname='Anonym',
             email='anonym@email.org',
             joined=datetime.now().date(),
             is_admin=False,
+            is_anonymous=True
         )
     try:
         user_id = decode_token(token).get('id')
@@ -38,6 +39,6 @@ async def get_current_authenticated_user(
         user_service: Annotated[UserService, Depends()]
 ):
     user = await get_current_user(token, user_service)
-    if not user:
-        raise InvalidToken
+    if user.is_anonymous:
+        raise NotAuthorized
     return user
