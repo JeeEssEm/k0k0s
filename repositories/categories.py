@@ -12,7 +12,7 @@ class CategoriesRepository(Repository):
             id=category.id,
             title=category.title,
             is_hidden=category.is_hidden,
-            is_deleted=category.deleted
+            is_deleted=category.is_deleted
         )
 
     async def _get_category_by_id(self, cid: int) -> Category:
@@ -31,6 +31,7 @@ class CategoriesRepository(Repository):
             title=data.title,
             is_hidden=data.is_hidden
         )
+        # TODO: handle unique constraint exception for category title
         self.session.add(cat)
         await self.session.commit()
         await self.session.refresh(cat)
@@ -38,8 +39,8 @@ class CategoriesRepository(Repository):
 
     async def edit_category(self, cid: int, data: CreateCategory) -> Category:
         cat = await self._get_category_by_id(cid)
-        cat.title = data.title or cat.title
-        cat.is_hidden = data.is_hidden or cat.is_hidden
+        cat.title = data.title
+        cat.is_hidden = data.is_hidden
         await self.session.commit()
         await self.session.refresh(cat)
         return self._convert_model_to_schema(cat)
@@ -69,7 +70,7 @@ class CategoriesRepository(Repository):
         )
 
     async def get_categories(self, hidden_included: bool) -> list[Category]:
-        q = select(models.Category).where(models.Category.deleted == False)  # noqa
+        q = select(models.Category).where(models.Category.is_deleted == False)  # noqa
 
         if not hidden_included:
             q = q.where(models.Category.is_hidden == False)  # noqa

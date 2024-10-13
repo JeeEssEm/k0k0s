@@ -9,7 +9,7 @@ class CategoriesService(Service):
 
     async def get_category_by_id(self, category_id: int, current_user: ShortUser) -> Category:
         category = await self.repository.get_category_by_id(category_id)
-        if category.is_hidden and not current_user.is_admin:
+        if (category.is_hidden and not current_user.is_admin) or category.is_deleted:
             raise CategoryNotFound
         return category
 

@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from core.utils import get_current_authenticated_user, get_current_user
-from services import CategoriesService
+from services import CategoriesService, ItemsService
 from schemas import ShortUser, CreateCategory
 from exceptions import NotEnoughRights
 
@@ -60,3 +60,16 @@ async def get_categories(
         current_user: Annotated[ShortUser, Depends(get_current_user)],
 ):
     return await category_service.get_categories(current_user)
+
+
+@router.get('/{category_id}/items')
+async def get_category_items(
+    category_id: int,
+    current_user: Annotated[ShortUser, Depends(get_current_user)],
+    items_service: Annotated[ItemsService, Depends()],
+    category_service: Annotated[CategoriesService, Depends()]
+):
+    category = await category_service.get_category_by_id(category_id, current_user)
+    return await items_service.get_items_by_category(
+        category, current_user
+    )

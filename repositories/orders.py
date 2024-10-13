@@ -54,7 +54,7 @@ class OrdersRepository(Repository):
         await self.session.refresh(order)
         return self._convert_model_to_schema(order)
 
-    async def update_order(self, order_id: int, data: CreateOrder) -> Order:
+    async def edit_order(self, order_id: int, data: CreateOrder) -> Order:
         order = await self._get_order_by_id(order_id)
         order.status = data.status
         await self.session.commit()

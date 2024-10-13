@@ -12,6 +12,6 @@ class Category(Base):
 
     title: Mapped[str] = mapped_column(unique=True)
     is_hidden: Mapped[bool]
-    deleted: Mapped[bool] = mapped_column(default=False)
+    is_deleted: Mapped[bool] = mapped_column(default=False)
 
     items: Mapped[list['Item']] = relationship(back_populates='category')

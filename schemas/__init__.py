@@ -3,3 +3,5 @@ from .auth import *
 from .categories import *
 from .items import *
 from .orders import *
+
+CategoryItems.model_rebuild()

@@ -1,9 +1,10 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from .items import Item
+    from .items import MiniItem
+
 
 
 class CreateCategory(BaseModel):
@@ -17,4 +18,4 @@ class Category(CreateCategory):
 
 
 class CategoryItems(Category):
-    items: list['Item']
+    items: list['MiniItem']
