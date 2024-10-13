@@ -11,7 +11,8 @@ class CategoriesRepository(Repository):
         return Category(
             id=category.id,
             title=category.title,
-            is_hidden=category.is_hidden
+            is_hidden=category.is_hidden,
+            is_deleted=category.deleted
         )
 
     async def _get_category_by_id(self, cid: int) -> Category:
@@ -26,7 +27,7 @@ class CategoriesRepository(Repository):
         )
 
     async def create_category(self, data: CreateCategory) -> Category:
-        cat = Category(
+        cat = models.Category(
             title=data.title,
             is_hidden=data.is_hidden
         )
@@ -35,7 +36,7 @@ class CategoriesRepository(Repository):
         await self.session.refresh(cat)
         return self._convert_model_to_schema(cat)
 
-    async def update_category(self, cid: int, data: CreateCategory) -> Category:
+    async def edit_category(self, cid: int, data: CreateCategory) -> Category:
         cat = await self._get_category_by_id(cid)
         cat.title = data.title or cat.title
         cat.is_hidden = data.is_hidden or cat.is_hidden
@@ -67,10 +68,11 @@ class CategoriesRepository(Repository):
             items=items
         )
 
-    async def get_public_categories(self) -> list[Category]:
-        q = select(models.Category).where(and_(
-            models.Category.is_hidden == False, models.Category.deleted == False  # noqa
-        ))
+    async def get_categories(self, hidden_included: bool) -> list[Category]:
+        q = select(models.Category).where(models.Category.deleted == False)  # noqa
+
+        if not hidden_included:
+            q = q.where(models.Category.is_hidden == False)  # noqa
         categories = await self.session.scalars(q)
         return list(map(
             self._convert_model_to_schema, categories.all())

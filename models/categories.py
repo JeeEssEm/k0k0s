@@ -10,7 +10,7 @@ from database import Base
 class Category(Base):
     __tablename__ = 'categories'
 
-    title: Mapped[str]
+    title: Mapped[str] = mapped_column(unique=True)
     is_hidden: Mapped[bool]
     deleted: Mapped[bool] = mapped_column(default=False)
 

@@ -32,7 +32,7 @@ async def login(
 @router.post('/register', status_code=status.HTTP_200_OK)
 async def register(
         form: CreateUser,
-        user_service: UserService = Depends()
+        user_service: Annotated[UserService, Depends()]
 ):
     return await user_service.create_user(form)
 
@@ -40,7 +40,7 @@ async def register(
 @router.post('/update-token', status_code=status.HTTP_200_OK)
 async def update_token(
         request: Request,
-        user_service: UserService = Depends()
+        user_service: Annotated[UserService, Depends()]
 ):
     refresh_token = request.cookies.get('refresh_token')
     token = await user_service.update_token(refresh_token)

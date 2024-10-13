@@ -13,6 +13,7 @@ class CreateCategory(BaseModel):
 
 class Category(CreateCategory):
     id: int
+    is_deleted: bool
 
 
 class CategoryItems(Category):
