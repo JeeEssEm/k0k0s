@@ -1,29 +1,24 @@
 from typing import Annotated
 
-from fastapi import status
-from fastapi import APIRouter, Path, Depends
+from fastapi import APIRouter, Depends
 
 from core.utils import get_current_user
 from schemas import User
 from services import UserService
 
-
 router = APIRouter(tags=['users'], prefix='/users')
 
 
-@router.get('/me', status_code=status.HTTP_200_OK,
-            summary='Получить текущего пользователя')
+@router.get('/me')
 async def get_me(
         current_user: Annotated[User, Depends(get_current_user)]
-):
+) -> User:
     return current_user
 
 
-@router.get('/{user_id}', status_code=status.HTTP_200_OK,
-            summary='Получить пользователя по его ID',
-            response_model=User)
+@router.get('/{user_id}')
 async def get_user(
-        user_id: Annotated[int, Path(ge=1, description='ID пользователя')],
-        user_service: UserService = Depends()
-):
+        user_id: int,
+        user_service: Annotated[UserService, Depends()]
+) -> User:
     return await user_service.get_by_id(user_id)

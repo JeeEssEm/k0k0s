@@ -1,6 +1,6 @@
 
 from services import UserService
-from schemas import CreateUser, Token
+from schemas import CreateUser, Token, User
 
 from typing import Annotated
 
@@ -17,7 +17,7 @@ async def login(
     response: Response,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     user_service: Annotated[UserService, Depends()]
-):
+) -> Token:
     username = form_data.username
     password = form_data.password
     tokens = await user_service.login_user(username, password)
@@ -33,7 +33,7 @@ async def login(
 async def register(
         form: CreateUser,
         user_service: Annotated[UserService, Depends()]
-):
+) -> User:
     return await user_service.create_user(form)
 
 
@@ -41,7 +41,7 @@ async def register(
 async def update_token(
         request: Request,
         user_service: Annotated[UserService, Depends()]
-):
+) -> Token:
     refresh_token = request.cookies.get('refresh_token')
     token = await user_service.update_token(refresh_token)
     return Token(

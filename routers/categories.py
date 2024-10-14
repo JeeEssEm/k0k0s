@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from core.utils import get_current_authenticated_user, get_current_user
 from services import CategoriesService, ItemsService
-from schemas import User, CreateCategory
+from schemas import User, CreateCategory, Category, CategoryItems
 from exceptions import NotEnoughRights
 
 router = APIRouter(tags=['categories'], prefix='/categories')
@@ -15,7 +15,7 @@ async def create_category(
     data: CreateCategory,
     current_user: Annotated[User, Depends(get_current_authenticated_user)],
     category_service: Annotated[CategoriesService, Depends()]
-):
+) -> Category:
     if not current_user.is_admin:
         raise NotEnoughRights
     return await category_service.create_category(data)
@@ -26,7 +26,7 @@ async def get_category_by_id(
         category_id: int,
         current_user: Annotated[User, Depends(get_current_user)],
         category_service: Annotated[CategoriesService, Depends()]
-):
+) -> Category:
     return await category_service.get_category_by_id(category_id, current_user)
 
 
@@ -36,7 +36,7 @@ async def edit_category(
     data: CreateCategory,
     current_user: Annotated[User, Depends(get_current_authenticated_user)],
     category_service: Annotated[CategoriesService, Depends()]
-):
+) -> Category:
     if not current_user.is_admin:
         raise NotEnoughRights
     return await category_service.edit_category(category_id, data)
@@ -47,7 +47,7 @@ async def delete_category(
     category_id: int,
     current_user: Annotated[User, Depends(get_current_authenticated_user)],
     category_service: Annotated[CategoriesService, Depends()]
-):
+) -> str:
     if not current_user.is_admin:
         raise NotEnoughRights
     await category_service.delete_category(category_id)
@@ -58,7 +58,7 @@ async def delete_category(
 async def get_categories(
         category_service: Annotated[CategoriesService, Depends()],
         current_user: Annotated[User, Depends(get_current_user)],
-):
+) -> list[Category]:
     return await category_service.get_categories(current_user)
 
 
@@ -68,7 +68,7 @@ async def get_category_items(
     current_user: Annotated[User, Depends(get_current_user)],
     items_service: Annotated[ItemsService, Depends()],
     category_service: Annotated[CategoriesService, Depends()]
-):
+) -> CategoryItems:
     category = await category_service.get_category_by_id(category_id, current_user)
     return await items_service.get_items_by_category(
         category, current_user
