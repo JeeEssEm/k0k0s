@@ -1,4 +1,4 @@
-from sqlalchemy import select, delete
+from sqlalchemy import select
 
 from .base import Repository
 import models
@@ -20,7 +20,7 @@ class CartRepository(Repository):
 
     async def get_cart_by_id(self, cart_id: int) -> Cart:
         q = select(models.CartItem).where(models.CartItem.cart_id == cart_id)
-        res = (await self.session.execute(q)).scalars().all()
+        res = (await self.session.scalars(q)).all()
         return self._convert_model_to_schema(res, cart_id)
 
     async def change_user_cart(self, user_id: int):

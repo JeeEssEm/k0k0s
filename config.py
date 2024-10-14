@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     HOST: str = '127.0.0.1'
     PORT: int = 8000
 
+    ALGORITHM: str = 'HS256'
     VERIFIED: bool = True
     SECRET_KEY: str = 'NON-SECRET-KEY'
     REFRESH_TOKEN_EXPIRES: int = 30

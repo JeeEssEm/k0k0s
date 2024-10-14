@@ -4,7 +4,6 @@ from config import settings
 from datetime import datetime, timedelta, timezone
 import jwt
 
-ALGORITHM = 'HS256'
 ph = PasswordHasher()
 
 
@@ -23,7 +22,7 @@ def generate_token(user_id: int, exp: datetime,
         'type': token_type,
         'exp': exp,
         'sign': md5(hashed_password.encode()).hexdigest()
-    }, algorithm=ALGORITHM, key=settings.SECRET_KEY)
+    }, algorithm=settings.ALGORITHM, key=settings.SECRET_KEY)
 
 
 def create_tokens(user_id: int, hashed_password: str) -> dict:
@@ -50,7 +49,7 @@ def create_tokens(user_id: int, hashed_password: str) -> dict:
 
 def decode_token(token: str) -> dict:
     return jwt.decode(
-        token, algorithms=[ALGORITHM],
+        token, algorithms=[settings.ALGORITHM],
         key=settings.SECRET_KEY
     )
 

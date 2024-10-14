@@ -1,4 +1,4 @@
-from schemas import Cart, User, Item
+from schemas import Cart, User
 from .base import Service
 from repositories import CartRepository
 from exceptions import ItemAlreadyInCart

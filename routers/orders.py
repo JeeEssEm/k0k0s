@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from core.utils import get_current_authenticated_user
-from services import OrdersService, ItemsService, CartService
-from schemas import CreateOrder, User, EditOrder
-from exceptions import NotEnoughRights, CartIsEmpty
+from services import OrdersService, CartService
+from schemas import CreateOrder, User
+from exceptions import CartIsEmpty
 
 
 router = APIRouter(tags=['orders'], prefix='/orders')
@@ -15,11 +15,9 @@ router = APIRouter(tags=['orders'], prefix='/orders')
 async def create_order(
         data: CreateOrder,
         order_service: Annotated[OrdersService, Depends()],
-        items_service: Annotated[ItemsService, Depends()],
         cart_service: Annotated[CartService, Depends()],
         current_user: Annotated[User, Depends(get_current_authenticated_user)],
 ):
-    await items_service.get_item_by_id(data.item_id, current_user)
     if await cart_service.is_cart_empty(current_user.cart_id):
         raise CartIsEmpty
     await cart_service.change_user_cart(current_user)
@@ -43,16 +41,16 @@ async def get_order(
     return await order_service.get_order_by_id(order_id, current_user)
 
 
-@router.patch('/{order_id}')
-async def edit_order(
-    order_id: int,
-    data: EditOrder,
-    order_service: Annotated[OrdersService, Depends()],
-    current_user: Annotated[User, Depends(get_current_authenticated_user)],
-):
-    if not current_user.is_admin:
-        raise NotEnoughRights  # заказы могут редактировать только админы
-    return await order_service.edit_order(order_id, data)
+# @router.patch('/{order_id}')
+# async def edit_order(
+#     order_id: int,
+#     data: EditOrder,
+#     order_service: Annotated[OrdersService, Depends()],
+#     current_user: Annotated[User, Depends(get_current_authenticated_user)],
+# ):
+#     if not current_user.is_admin:
+#         raise NotEnoughRights  # заказы могут редактировать только админы
+#     return await order_service.edit_order(order_id, data)
 
 
 @router.delete('/{order_id}')

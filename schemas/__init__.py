@@ -7,4 +7,5 @@ from .cart import *
 
 CategoryItems.model_rebuild()  # noqa
 Item.model_rebuild()  # noqa
-Cart.model_rebuild()
+Cart.model_rebuild()  # noqa
+Order.model_rebuild()  # noqa

@@ -4,23 +4,25 @@ import models
 from .base import Repository
 from schemas import (Order, CreateOrder, MiniUser, MiniItem, EditOrder,
                      MiniOrder, Cart)
-from exceptions import OrderNotFound
+from exceptions import OrderNotFound, OrderAlreadyPaid
 
 
 class OrdersRepository(Repository):
-    def _convert_model_to_schema(self, order: models.Order) -> Order:
+    async def _convert_model_to_schema(self, order: models.Order) -> Order:
         return Order(
             id=order.id,
             comment=order.comment,
             status=order.status,
             is_paid=order.is_paid,
             cart=Cart(
-                cart_id=order.cart_id,
+                id=order.cart_id,
                 items=[MiniItem(
-                    id=item.id,
-                    title=item.title,
-                    price=item.price)
-                    for item in order.cart.items
+                    id=item.item.id,
+                    title=item.item.title,
+                    price=item.item.price,
+                    amount=item.amount
+                )
+                    for item in (await order.awaitable_attrs.cart).items
                 ]
             ),
             user=MiniUser(
@@ -37,7 +39,7 @@ class OrdersRepository(Repository):
         return order
 
     async def get_order_by_id(self, order_id: int) -> Order:
-        return self._convert_model_to_schema(
+        return await self._convert_model_to_schema(
             await self._get_order_by_id(order_id)
         )
 
@@ -50,21 +52,22 @@ class OrdersRepository(Repository):
         self.session.add(order)
         await self.session.commit()
         await self.session.refresh(order)
-        return self._convert_model_to_schema(order)
+        return await self._convert_model_to_schema(order)
 
     async def edit_order(self, order_id: int, data: EditOrder) -> Order:
         order = await self._get_order_by_id(order_id)
         order.status = data.status
         await self.session.commit()
         await self.session.refresh(order)
-        return self._convert_model_to_schema(order)
+        return await self._convert_model_to_schema(order)
 
     async def get_orders(self, status: models.Status | None = None) -> list[Order]:
         q = select(models.Order)
         if status:
             q = q.where(models.Order.status == status)  # noqa
-        orders = await self.session.execute(q)
-        return list(map(self._convert_model_to_schema, orders.scalars().all()))
+        orders = await self.session.scalars(q)
+        # return list(map(self._convert_model_to_schema, orders.scalars().all()))
+        return [await self._convert_model_to_schema(order) for order in orders.all()]
         # TODO: pagination
 
     async def cancel_order(self, order_id: int):
@@ -80,7 +83,6 @@ class OrdersRepository(Repository):
         return [MiniOrder(
             id=order.id,
             comment=order.comment,
-            amount=order.amount,
             is_paid=order.is_paid,
             status=order.status
         )
@@ -88,10 +90,8 @@ class OrdersRepository(Repository):
 
     async def purchase_order(self, order_id: int):
         order = await self._get_order_by_id(order_id)
+        if order.is_paid:
+            raise OrderAlreadyPaid
         order.is_paid = True
         await self.session.commit()
         await self.session.refresh(order)
-
-    async def get_full_order(self, order_id: int):
-        ...
-        # TODO: переписать логику под новую БД. Добавить работу с корзиной...

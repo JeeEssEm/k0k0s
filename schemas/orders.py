@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from .users import MiniUser
 if TYPE_CHECKING:
@@ -10,7 +10,6 @@ from models import Status
 
 class CreateOrder(BaseModel):
     comment: str | None
-    amount: int = Field(default=1, ge=1)
 
 
 class EditOrder(BaseModel):

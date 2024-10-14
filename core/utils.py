@@ -17,6 +17,7 @@ async def get_current_user(
     if not token:
         return User(
             id=-1,
+            cart_id=-1,
             fullname='Anonym',
             email='anonym@email.org',
             joined=datetime.now().date(),
