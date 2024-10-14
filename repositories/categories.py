@@ -3,7 +3,7 @@ from schemas import (Category, CreateCategory, CategoryItems, Item)
 import models
 from exceptions import CategoryNotFound
 
-from sqlalchemy import select, and_
+from sqlalchemy import select
 
 
 class CategoriesRepository(Repository):

@@ -13,6 +13,7 @@ int_pk = Annotated[int, mapped_column(primary_key=True)]
 created_at = Annotated[datetime, mapped_column(server_default=func.now())]
 updated_at = Annotated[datetime, mapped_column(server_default=func.now(),
                                                onupdate=datetime.now)]
+
 str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
 
 
@@ -28,7 +29,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 
 def load_models():
-    from models import Item, User, Order, Category  # noqa
+    from models import Item, User, Order, Category, Cart, CartItem  # noqa
 
 
 engine = create_async_engine(get_database_url())

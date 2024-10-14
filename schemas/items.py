@@ -24,3 +24,4 @@ class MiniItem(BaseModel):
     id: int
     title: str
     price: int | None
+    amount: int | None

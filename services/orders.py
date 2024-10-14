@@ -8,7 +8,7 @@ class OrdersService(Service):
     repository: OrdersRepository
 
     async def create_order(self, data: CreateOrder, user: User) -> Order:
-        return await self.repository.create_order(data, user.id)
+        return await self.repository.create_order(data, user.id, user.cart_id)
 
     async def get_order_by_id(self, order_id: int, current_user: User) -> Order:
         order = await self.repository.get_order_by_id(order_id)

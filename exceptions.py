@@ -17,3 +17,6 @@ UserAlreadyExists = HTTPException(status.HTTP_400_BAD_REQUEST,
 
 NotEnoughRights = HTTPException(status.HTTP_403_FORBIDDEN, 'Not enough rights')
 NotAuthorized = HTTPException(status.HTTP_401_UNAUTHORIZED, 'not authorized')
+CartIsEmpty = HTTPException(status.HTTP_400_BAD_REQUEST, 'Cart is empty')
+ItemNotInCart = HTTPException(status.HTTP_400_BAD_REQUEST, 'Item not in cart')
+ItemAlreadyInCart = HTTPException(status.HTTP_400_BAD_REQUEST, 'Item already in cart')

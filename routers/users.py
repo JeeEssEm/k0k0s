@@ -3,10 +3,9 @@ from typing import Annotated
 from fastapi import status
 from fastapi import APIRouter, Path, Depends
 
-from models import User
-from core.utils import get_current_user
+from core.utils import get_current_user, get_current_authenticated_user
 from schemas import User
-from services import UserService
+from services import UserService, CartService
 
 
 router = APIRouter(tags=['users'], prefix='/users')

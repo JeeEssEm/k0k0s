@@ -26,6 +26,7 @@ class MiniUser(BaseUser):
 
 
 class User(MiniUser):
+    cart_id: int
     joined: date
     is_admin: bool | None
 

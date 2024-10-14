@@ -3,6 +3,8 @@ from .auth import *
 from .categories import *
 from .items import *
 from .orders import *
+from .cart import *
 
-CategoryItems.model_rebuild()
-Item.model_rebuild()
+CategoryItems.model_rebuild()  # noqa
+Item.model_rebuild()  # noqa
+Cart.model_rebuild()

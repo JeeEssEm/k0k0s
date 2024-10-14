@@ -36,7 +36,8 @@ class ItemsRepository(Repository):
                 MiniItem(
                     id=item.id,
                     title=item.title,
-                    price=item.price
+                    price=item.price,
+                    amount=item.amount
                 )
                 for item in items
             ]
@@ -90,8 +91,8 @@ class ItemsRepository(Repository):
     ) -> CategoryItems:
         q = select(models.Item).where(and_(
             models.Item.category_id == category.id,
-            models.Item.is_deleted == False
-        ))  # noqa
+            models.Item.is_deleted == False  # noqa
+        ))
         if not hidden_included:
             q = q.where(models.Item.is_hidden == False)  # noqa
         items = await self.session.scalars(q)

@@ -2,7 +2,8 @@ from sqlalchemy import select
 
 import models
 from .base import Repository
-from schemas import Order, CreateOrder, MiniUser, MiniItem, EditOrder, MiniOrder
+from schemas import (Order, CreateOrder, MiniUser, MiniItem, EditOrder,
+                     MiniOrder, Cart)
 from exceptions import OrderNotFound
 
 
@@ -13,11 +14,14 @@ class OrdersRepository(Repository):
             comment=order.comment,
             status=order.status,
             is_paid=order.is_paid,
-            item_id=order.item_id,
-            item=MiniItem(
-                id=order.item.id,
-                title=order.item.title,
-                price=order.item.price
+            cart=Cart(
+                cart_id=order.cart_id,
+                items=[MiniItem(
+                    id=item.id,
+                    title=item.title,
+                    price=item.price)
+                    for item in order.cart.items
+                ]
             ),
             user=MiniUser(
                 id=order.user.id,
@@ -37,11 +41,11 @@ class OrdersRepository(Repository):
             await self._get_order_by_id(order_id)
         )
 
-    async def create_order(self, data: CreateOrder, user_id: int) -> Order:
+    async def create_order(self, data: CreateOrder, user_id: int, cart_id: int) -> Order:
         order = models.Order(
-            item_id=data.item_id,
             user_id=user_id,
-            comment=data.comment
+            comment=data.comment,
+            cart_id=cart_id,
         )
         self.session.add(order)
         await self.session.commit()
@@ -75,8 +79,6 @@ class OrdersRepository(Repository):
 
         return [MiniOrder(
             id=order.id,
-            item_id=order.item_id,
-            item=order.item.title,
             comment=order.comment,
             amount=order.amount,
             is_paid=order.is_paid,
@@ -89,3 +91,7 @@ class OrdersRepository(Repository):
         order.is_paid = True
         await self.session.commit()
         await self.session.refresh(order)
+
+    async def get_full_order(self, order_id: int):
+        ...
+        # TODO: переписать логику под новую БД. Добавить работу с корзиной...

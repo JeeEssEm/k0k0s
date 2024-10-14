@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from core.utils import get_current_authenticated_user
-from services import OrdersService, ItemsService
+from services import OrdersService, ItemsService, CartService
 from schemas import CreateOrder, User, EditOrder
-from exceptions import NotEnoughRights
+from exceptions import NotEnoughRights, CartIsEmpty
 
 
 router = APIRouter(tags=['orders'], prefix='/orders')
@@ -16,9 +16,13 @@ async def create_order(
         data: CreateOrder,
         order_service: Annotated[OrdersService, Depends()],
         items_service: Annotated[ItemsService, Depends()],
+        cart_service: Annotated[CartService, Depends()],
         current_user: Annotated[User, Depends(get_current_authenticated_user)],
 ):
     await items_service.get_item_by_id(data.item_id, current_user)
+    if await cart_service.is_cart_empty(current_user.cart_id):
+        raise CartIsEmpty
+    await cart_service.change_user_cart(current_user)
     return await order_service.create_order(data, current_user)
 
 

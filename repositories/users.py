@@ -23,6 +23,7 @@ class UsersRepository(Repository):
             email=user.email,
             joined=user.created_at.date(),
             is_admin=user.is_admin,
+            cart_id=user.cart_id
         )
 
     async def get_by_id(self, user_id: int) -> User:
@@ -58,7 +59,10 @@ class UsersRepository(Repository):
             phone=user.phone,
             verified=settings.VERIFIED
         )
+        new_cart = models.Cart()
+        new_user.cart = new_cart
         self.session.add(new_user)
+        self.session.add(new_cart)
         await self.session.commit()
         await self.session.refresh(new_user)
         return self._convert_model_to_schema(new_user)

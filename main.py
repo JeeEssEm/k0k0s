@@ -1,4 +1,4 @@
-from routers import users, auth, orders, categories  # , items
+from routers import users, auth, orders, categories, cart  # , items
 from config import settings
 from database import init_models
 
@@ -20,6 +20,7 @@ app.include_router(users)
 app.include_router(orders)
 # app.include_router(items)
 app.include_router(categories)
+app.include_router(cart)
 
 
 @app.get('/')
