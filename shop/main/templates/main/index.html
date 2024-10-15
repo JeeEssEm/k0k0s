@@ -1,0 +1,44 @@
+{% extends 'main/base.html' %}
+
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    <h1>Магазин цитат</h1><br><br>
+    {%for product in products %}
+        <h3> №{{ product.id }}: {{ product.title }}</h3>
+
+        <p style="color:red">By {{product.seller}}</p>
+        <div class="col">
+          <div class="card shadow-sm">
+            <svg class="bd-placeholder-img card-img-top" width="50%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                  {% block object-tools %}
+                    <div>
+                        <form action="{% url 'make_order' product.id %} method="POST">
+                        {% csrf_token %}
+                        <input type="submit" id="{{product.id}}" value="buy">
+                        </form>
+
+                    </div>
+                    {{ block.super }}
+                  {% endblock %}
+                  {% if product.price == 1 %}
+                  <div class="text-body-secondary">Цена: всего {{product.price}} баран</div>
+                  {% elif product.price == 2 or product.price == 3 or product.price == 4 %}
+                  <div class="text-body-secondary">Цена: всего {{product.price}} баранa</div>
+                  {% else %}
+                  <div class="text-body-secondary">Цена: всего {{product.price}} баранов</div>
+                  {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
+
+

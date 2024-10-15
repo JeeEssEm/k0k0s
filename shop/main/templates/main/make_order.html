@@ -1,0 +1,33 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+    <h1>Add product</h1>
+    <form action="/add_product/" method="post">
+        {% csrf_token %}
+        <label for="title">Product's title: </label>
+        <input id="title" type="text" name="title" value="{{ title }}">
+        <br>
+        <label for="price">Product's price: </label>
+        <input id="price" type="text"  name="price" value="{{ price }}">
+        <br>
+        <p>Choose product's mood:</p>
+
+        <form>
+            <input type="radio" id="Melancholic" name="mood" value="1">
+            <label for="Melancholic">Melancholic</label><br>
+            <input type="radio" id="Wild" name="mood" value="2">
+            <label for="Wild">Wild</label><br>
+            <input type="radio" id="Funny" name="mood" value="3">
+            <label for="Funny">Funny</label><br>
+            <input type="radio" id="Morally Gray" name="mood" value="4">
+            <label for="Morally Gray">Morally Gray</label><br>
+        </form>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+{% endblock %}

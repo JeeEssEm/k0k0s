@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+    <h1>Надо купить:</h1><br>
+    {% for order in orders %}
+        <h3> {{order.title}} ({{order.number}} times) </h3>
+        <p style="color:blue" > {{order.status}}</p>
+        <br>
+    {% endfor %}
+{% endblock %}

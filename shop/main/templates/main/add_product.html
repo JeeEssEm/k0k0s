@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+    <h1>Add product</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="title">Product's title: </label>
+        <input id="title" type="text" name="title" value="{{ title }}">
+        <br>
+        <label for="price">Product's price: </label>
+        <input id="price" type="text"  name="price" value="{{ price }}">
+        <br>
+        <p>Choose product's mood:</p>
+
+
+            <input type="radio" id="1" name="mood" value="1">
+            <label for="1">Melancholic</label><br>
+            <input type="radio" id="2" name="mood" value="2">
+            <label for="2">Wild</label><br>
+            <input type="radio" id="3" name="mood" value="3">
+            <label for="3">Funny</label><br>
+            <input type="radio" id="4" name="mood" value="4">
+            <label for="4">Morally Gray</label><br>
+
+
+        <br>
+        <button type="submit">Save</button>
+        <span> {{ error }} </span>
+    </form>
+
+{% endblock %}
