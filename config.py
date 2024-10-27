@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRES: int = 30
     ACCESS_TOKEN_EXPIRES: int = 30
 
-    S3_ACCESS_KEY_ID: str = 'VmhtJUnARhUxhfr5ESwH'
-    S3_SECRET_ACCESS_KEY: str = '1kXBbusINVTQVsjvebupg3sx5D3kj2JlMmCaTaO8'
-    S3_ENDPOINT: str = 'http://127.0.0.1:9000'
+    S3_ACCESS_KEY_ID: str = 'access key'
+    S3_SECRET_ACCESS_KEY: str = 'secret key'
+    S3_ENDPOINT: str = 'endpoint url'
 
 
 settings = Settings()
