@@ -21,3 +21,7 @@ CartIsEmpty = HTTPException(status.HTTP_400_BAD_REQUEST, 'Cart is empty')
 ItemNotInCart = HTTPException(status.HTTP_400_BAD_REQUEST, 'Item not in cart')
 ItemAlreadyInCart = HTTPException(status.HTTP_400_BAD_REQUEST, 'Item already in cart')
 OrderAlreadyPaid = HTTPException(status.HTTP_400_BAD_REQUEST, 'Order already paid')
+
+ImageConvertingError = HTTPException(status.HTTP_400_BAD_REQUEST, 'Image cannot be converted')
+FileMustBeImage = HTTPException(status.HTTP_400_BAD_REQUEST, 'File must be image')
+ImageNotFound = HTTPException(status.HTTP_404_NOT_FOUND, 'Image not found')

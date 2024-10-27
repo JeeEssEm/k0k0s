@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from sqlalchemy import select, or_
 
 from config import settings
@@ -23,7 +25,8 @@ class UsersRepository(Repository):
             email=user.email,
             joined=user.created_at.date(),
             is_admin=user.is_admin,
-            cart_id=user.cart_id
+            cart_id=user.cart_id,
+            avatar=user.avatar,
         )
 
     async def get_by_id(self, user_id: int) -> User:
@@ -66,3 +69,22 @@ class UsersRepository(Repository):
         await self.session.commit()
         await self.session.refresh(new_user)
         return self._convert_model_to_schema(new_user)
+
+    async def upload_image(self,
+                           user_id: int,
+                           image: BytesIO,
+                           path: str) -> User:
+        user = await self._get_user_by_id(user_id)
+        if user.avatar is None:
+            user.avatar = path
+        else:
+            path = user.avatar
+
+        await self.s3_client.upload_file(path, 'images', image)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return self._convert_model_to_schema(user)
+
+    async def get_image(self, user_id: int):
+        user = await self._get_user_by_id(user_id)
+        return await self.s3_client.get_file(user.avatar, 'images')

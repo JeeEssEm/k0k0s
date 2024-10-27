@@ -4,6 +4,7 @@ from datetime import datetime
 from fastapi import Depends
 
 from .security import is_valid_token, decode_token
+
 from services.users import UserService
 from routers.auth import oauth2_scheme
 from exceptions import InvalidToken, TokenExpired, NotAuthorized

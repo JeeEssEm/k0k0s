@@ -23,6 +23,7 @@ class CreateUser(BaseUser):
 
 class MiniUser(BaseUser):
     id: int
+    avatar: str | None
 
 
 class User(MiniUser):

@@ -1,9 +1,12 @@
+from fastapi import UploadFile
+
 from .base import Service
+from core.images import convert_image_to_webp
 from core.security import verify_password, create_tokens, decode_token
 from repositories import UsersRepository
 from schemas import CreateUser, User
 from exceptions import (UserNotFound, InvalidToken, IncorrectPassword,
-                        UserAlreadyExists)
+                        UserAlreadyExists, ImageNotFound)
 
 
 class UserService(Service):
@@ -41,3 +44,17 @@ class UserService(Service):
 
         except Exception:
             raise InvalidToken
+
+    async def upload_image(self, user_id: int, image: UploadFile):
+        file = await convert_image_to_webp(image)
+        path = f'/avatars/{user_id}.webp'
+        return await self.repository.upload_image(user_id, file, path)
+
+    async def get_user_image(self, user_id: int):
+        user = await self.repository.get_by_id(user_id)
+        if not user.avatar:
+            raise ImageNotFound
+        try:
+            return await self.repository.get_image(user_id)
+        except Exception:
+            raise ImageNotFound

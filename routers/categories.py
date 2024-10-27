@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from core.utils import get_current_authenticated_user, get_current_user
+from core.users import get_current_authenticated_user, get_current_user
 from services import CategoriesService, ItemsService
 from schemas import User, CreateCategory, Category, CategoryItems
 from exceptions import NotEnoughRights

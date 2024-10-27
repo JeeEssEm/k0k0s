@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from core.utils import get_current_authenticated_user
+from core.users import get_current_authenticated_user
 from services import OrdersService, CartService
 from schemas import CreateOrder, User, Order, MiniOrder
 from exceptions import CartIsEmpty
