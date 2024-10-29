@@ -12,11 +12,7 @@ async def convert_image_to_webp(image: UploadFile) -> BytesIO:
 
     try:
         image = Image.open(BytesIO(await image.read()))
-    except Exception:
-        raise ImageConvertingError
-
-    output = BytesIO()
-    try:
+        output = BytesIO()
         image.save(output, 'WEBP', quality=70)
         output.seek(0)
     except Exception:

@@ -3,7 +3,7 @@ from fastapi import UploadFile
 from .base import Service
 from core.images import convert_image_to_webp
 from core.security import verify_password, create_tokens, decode_token
-from repositories import UsersRepository
+from repositories import UsersRepository, S3Users
 from schemas import CreateUser, User
 from exceptions import (UserNotFound, InvalidToken, IncorrectPassword,
                         UserAlreadyExists, ImageNotFound)
@@ -11,6 +11,7 @@ from exceptions import (UserNotFound, InvalidToken, IncorrectPassword,
 
 class UserService(Service):
     repository: UsersRepository
+    s3_repository: S3Users
 
     async def login_user(self, username: str, password: str) -> dict:
         user = await self.repository.get_by_username(username)
@@ -47,14 +48,14 @@ class UserService(Service):
 
     async def upload_image(self, user_id: int, image: UploadFile):
         file = await convert_image_to_webp(image)
-        path = f'/avatars/{user_id}.webp'
-        return await self.repository.upload_image(user_id, file, path)
+        path = await self.s3_repository.upload_image(user_id, file)
+        return await self.repository.upload_image(user_id, path)
 
     async def get_user_image(self, user_id: int):
         user = await self.repository.get_by_id(user_id)
         if not user.avatar:
             raise ImageNotFound
         try:
-            return await self.repository.get_image(user_id)
+            return await self.s3_repository.get_image(user.avatar)
         except Exception:
             raise ImageNotFound

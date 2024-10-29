@@ -72,19 +72,10 @@ class UsersRepository(Repository):
 
     async def upload_image(self,
                            user_id: int,
-                           image: BytesIO,
                            path: str) -> User:
         user = await self._get_user_by_id(user_id)
-        if user.avatar is None:
-            user.avatar = path
-        else:
-            path = user.avatar
+        user.avatar = path
 
-        await self.s3_client.upload_file(path, 'images', image)
         await self.session.commit()
         await self.session.refresh(user)
         return self._convert_model_to_schema(user)
-
-    async def get_image(self, user_id: int):
-        user = await self._get_user_by_id(user_id)
-        return await self.s3_client.get_file(user.avatar, 'images')
